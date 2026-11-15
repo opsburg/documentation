@@ -76,10 +76,7 @@ A city with no model shows "No model yet." To the founder it adds "Bring your ow
 
 "Keys are stored encrypted and never shown again." The secret fields are the **API key** and the **Secret access key**. The API never returns them, to anyone: the founder gets a placeholder in their place.
 
-Encryption at rest depends on the operator:
-
-- With `SECRETS_ENCRYPTION_KEY` set, Opsburg encrypts secrets with AES-256-GCM before writing them to MongoDB. A database dump or backup then holds ciphertext, not usable keys. The same applies to Git tokens and DNS registrar secrets.
-- Without it, secrets are stored as plain text.
+Opsburg encrypts secrets with AES-256-GCM, using the operator's `SECRETS_ENCRYPTION_KEY`, before writing them to MongoDB. A database dump or backup then holds ciphertext, not usable keys. The same applies to Git tokens and DNS registrar secrets. The key is required: the backend does not start without it, so no secret is written in clear.
 
 The key holds 32 bytes, as base64 or as 64 hex characters. Generate one with:
 
@@ -94,5 +91,5 @@ Secrets written with a key can be read only with that same key. If you lose or c
 :::
 
 :::note
-Encryption protects the database, not the running server: the backend holds the key to decrypt secrets when it calls a provider. Secrets saved before you set the key stay in plain text until they are saved again.
+Encryption protects the database, not the running server: the backend holds the key to decrypt secrets when it calls a provider. An installation that ran a release before 0.3.0 without a key still holds the secrets it saved then in plain text, until they are saved again.
 :::

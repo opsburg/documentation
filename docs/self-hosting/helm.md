@@ -12,7 +12,7 @@ The Opsburg chart deploys the standard image (backend and nginx in one container
 oci://ghcr.io/opsburg/charts/opsburg
 ```
 
-The chart version matches the Opsburg release it ships: chart `0.2.0` runs image `ghcr.io/opsburg/opsburg:0.2.0`.
+The chart version matches the Opsburg release it ships: chart `0.3.0` runs image `ghcr.io/opsburg/opsburg:0.3.0`.
 
 :::note[MongoDB is not part of the chart]
 Bring your own MongoDB, reachable from the cluster, and give the console its address in `NOSQL_DATABASE_URL`. Use a managed service or the installation method your team already runs.
@@ -40,8 +40,8 @@ kubectl create secret generic opsburg-secrets -n opsburg \
 
 Replace the MongoDB address and credentials with your own. With Sealed Secrets or External Secrets, create a Secret with the same keys instead.
 
-:::warning[JWT_SECRET is required]
-The chart sets `NODE_ENV=production`, and in production the backend does not start without `JWT_SECRET` (at least 32 bytes). The pod still turns Ready, because the probes check nginx, but every API call answers `502`. Check the pod logs if the console loads and nothing works.
+:::warning[Required variables]
+The backend does not start without `JWT_SECRET` (at least 32 bytes, required in production mode, which the chart sets), `SECRETS_ENCRYPTION_KEY` (32 bytes) and `FRONTEND_URL` (set in the values file below). When one is missing, the container exits and restarts, and the pod never turns Ready. The reason is in the pod logs.
 :::
 
 :::danger[Back up SECRETS_ENCRYPTION_KEY]
@@ -81,13 +81,13 @@ resources:
     memory: 1Gi
 ```
 
-The ingress class, the annotations and the resource figures are examples: adapt them to your cluster. `FRONTEND_URL` must be the public URL of the console, without a trailing slash. The `env` map you write is merged with the chart's default, so `NODE_ENV: production` stays.
+The ingress class, the annotations and the resource figures are examples: adapt them to your cluster. `FRONTEND_URL` is required: it must be the public URL of the console, starting with `https://` or `http://`, without a trailing slash. The `env` map you write is merged with the chart's default, so `NODE_ENV: production` stays.
 
 ## 3. Install
 
 ```bash
 helm install opsburg oci://ghcr.io/opsburg/charts/opsburg \
-  --version 0.2.0 \
+  --version 0.3.0 \
   --namespace opsburg \
   -f values.yaml
 ```
@@ -97,7 +97,7 @@ Then open the console at your host, create the first account and found your city
 To read every value with its comments:
 
 ```bash
-helm show values oci://ghcr.io/opsburg/charts/opsburg --version 0.2.0
+helm show values oci://ghcr.io/opsburg/charts/opsburg --version 0.3.0
 ```
 
 ## Values
@@ -109,8 +109,8 @@ helm show values oci://ghcr.io/opsburg/charts/opsburg --version 0.2.0
 | `image.tag` | `""` | Image tag. Empty means the chart's `appVersion`. |
 | `image.pullPolicy` | `IfNotPresent` | Image pull policy. |
 | `imagePullSecrets` | `[]` | Pull secrets, for a mirror registry that needs them. |
-| `env` | `NODE_ENV: production` | Plain environment variables, as a map of name to value. Values are quoted for you. |
-| `secretEnv` | `{}` | Sensitive variables. The chart writes them into a Secret it creates and loads it into the container. |
+| `env` | `NODE_ENV: production` | Plain environment variables, as a map of name to value. Values are quoted for you. Put `FRONTEND_URL` here: it is required. |
+| `secretEnv` | `{}` | Sensitive variables. The chart writes them into a Secret it creates and loads it into the container. `JWT_SECRET` and `SECRETS_ENCRYPTION_KEY` are required, here or in `existingSecret`. |
 | `existingSecret` | `""` | Name of a Secret you manage. Every key becomes an environment variable. |
 | `service.type` | `ClusterIP` | Service type. |
 | `service.port` | `80` | Service port. It targets port 80 of the container (nginx). |
@@ -139,7 +139,14 @@ kubectl rollout restart deployment -n opsburg -l app.kubernetes.io/instance=opsb
 
 ### Probes
 
-The container has fixed probes: readiness is an HTTP `GET /` on port 80 (nginx serving the browser app) and liveness is a TCP check on the same port. Neither checks the backend.
+The container has fixed probes. Both are an HTTP `GET /api/echo` on port 80, which nginx forwards to the backend, so they fail when either nginx or the backend does not answer.
+
+| Probe | Settings | Effect |
+| --- | --- | --- |
+| Readiness | every 10 seconds | The pod receives traffic only while the backend answers. |
+| Liveness | starts after 30 seconds, every 20 seconds, 3 failures in a row | Kubernetes restarts a container whose backend stopped answering. |
+
+The container also exits by itself when the backend or nginx exits, so Kubernetes restarts it without waiting for the liveness probe.
 
 ## Behind an ingress controller
 

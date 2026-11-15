@@ -46,11 +46,18 @@ docker run -d --name opsburg \
 
 ### Docker Compose
 
+The [compose file](./docker-compose.md) of the repository already passes `SENTRY_DSN` from `.env`:
+
+```bash title=".env"
+SENTRY_DSN=https://examplePublicKey@o0.ingest.sentry.io/0
+```
+
+To set `SENTRY_ENVIRONMENT` as well, add it under `environment:` of the `opsburg` service:
+
 ```yaml
 services:
   opsburg:
     environment:
-      SENTRY_DSN: https://examplePublicKey@o0.ingest.sentry.io/0
       SENTRY_ENVIRONMENT: production
 ```
 

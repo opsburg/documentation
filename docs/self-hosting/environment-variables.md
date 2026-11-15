@@ -1,12 +1,12 @@
 ---
 title: Environment variables
-description: Every environment variable Opsburg 0.2.0 reads, with its default and whether you need it, plus the runtime config.js of the browser app.
+description: Every environment variable Opsburg 0.3.0 reads, with its default and whether you need it, plus the runtime config.js of the browser app.
 sidebar_position: 4
 ---
 
 # Environment variables
 
-This page lists the variables release 0.2.0 reads. A variable that is not on this page has no effect on this release, even if it appears in an older example or comment.
+This page lists the variables release 0.3.0 reads. A variable that is not on this page has no effect on this release, even if it appears in an older example or comment.
 
 How values are read:
 
@@ -16,17 +16,19 @@ How values are read:
 
 ## Minimum set
 
-| Image | You must set | Strongly recommended |
-| --- | --- | --- |
-| All-in-one | Nothing | `FRONTEND_URL`, `SECRETS_ENCRYPTION_KEY` |
-| Standard image, Docker Compose, Helm | `NOSQL_DATABASE_URL`, `JWT_SECRET` | `FRONTEND_URL`, `SECRETS_ENCRYPTION_KEY`, `NODE_ENV=production` |
+| Image | You must set |
+| --- | --- |
+| All-in-one | `FRONTEND_URL`, `SECRETS_ENCRYPTION_KEY` |
+| Standard image, Docker Compose, Helm | `FRONTEND_URL`, `SECRETS_ENCRYPTION_KEY`, `JWT_SECRET`, `NOSQL_DATABASE_URL` |
+
+The backend does not start without `FRONTEND_URL` and `SECRETS_ENCRYPTION_KEY`, in any image. Both images run in production mode, so the backend also needs `JWT_SECRET`: the all-in-one image generates one when it is missing, the standard image does not start without it. The all-in-one image checks `FRONTEND_URL` and `SECRETS_ENCRYPTION_KEY` before it starts MongoDB and Redis, and stops at once with a message that names the missing ones.
 
 ## Server
 
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
-| `NODE_ENV` | No | unset (treated as development) | `production` makes `JWT_SECRET` mandatory. Also the fallback for `SENTRY_ENVIRONMENT`. The Helm chart sets `production`, the all-in-one image sets `prod`. |
-| `FRONTEND_URL` | Recommended | `http://localhost:5173` | Public URL of the console, without a trailing slash. The browser lands here after a GitHub, Google or Microsoft sign-in, and city invitation links start with it. When it starts with `https://`, the session cookies are marked `Secure`. |
+| `NODE_ENV` | No | `production` in both images, unset (treated as development) outside them | `production` makes `JWT_SECRET` mandatory. Also the fallback for `SENTRY_ENVIRONMENT`. Leave it as it is in the images. |
+| `FRONTEND_URL` | Yes | none | Public URL of the console, without a trailing slash. It must start with `http://` or `https://`, or the backend refuses to start. The browser lands here after a GitHub, Google or Microsoft sign-in, and city invitation links start with it. When it starts with `https://`, the session cookies are marked `Secure`. |
 | `PUBLIC_URL` | No | Value of `FRONTEND_URL` | Public URL the sign-in providers call back to. Set it only when the providers must reach the console on a different address than the browser does. |
 | `HTTP_PORT` | No | `3000` | Port the backend listens on. `PORT` is read when `HTTP_PORT` is unset. Leave both alone in the Opsburg images: nginx forwards to port 3000. |
 | `TRUST_PROXY` | No | `127.0.0.1` in the images, off otherwise | Proxies whose `X-Forwarded-For` header the backend believes, to find the client address for its per-IP rate limits. `true` trusts every hop, `false` none, or give a comma-separated list of addresses and CIDR ranges. Keep `127.0.0.1` in the list: it is the nginx inside the container. |
@@ -53,11 +55,11 @@ At startup the backend logs whether MongoDB is a replica set or a standalone ser
 
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
-| `JWT_SECRET` | Yes with `NODE_ENV=production` | All-in-one: generated on first start and kept in `/data/secrets/jwt_secret`. Otherwise: a random value per process. | Signs the session cookie. At least 32 bytes, or the backend refuses to start. Generate it with `openssl rand -hex 32`. Changing it signs everybody out. |
+| `JWT_SECRET` | Yes with `NODE_ENV=production`, so in both images | All-in-one: generated on first start and kept in `/data/secrets/jwt_secret`. Standard image: none, the backend does not start without it. Outside the images and outside production: a random value per process. | Signs the session cookie. At least 32 bytes, or the backend refuses to start. Generate it with `openssl rand -hex 32`. Changing it signs everybody out. |
 | `COOKIE_SECRET` | No | Derived from `JWT_SECRET` | Signs the short-lived cookie that carries a GitHub, Google or Microsoft sign-in from start to callback. |
 
 :::warning
-Without `JWT_SECRET` and outside production, the backend makes up a random secret and logs a warning: every restart then signs everybody out. Always set it outside a development machine (the all-in-one image does it for you).
+Without `JWT_SECRET` and outside production, the backend makes up a random secret and logs a warning: every restart then signs everybody out. This only happens when you run the backend outside the images, for example on a development machine: both images run in production mode.
 :::
 
 A session lasts 7 days and lives in an httpOnly cookie named `opsburg_session`.
@@ -67,7 +69,7 @@ A session lasts 7 days and lives in an httpOnly cookie named `opsburg_session`.
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
 | `ALLOW_EMBEDDED_LOGIN` | No | `true` | Username and password sign-in. When off, sign-up with a password is off too, and only the configured providers remain. |
-| `REGISTRATION_ALLOWED` | No | `true` | Username and password sign-up. |
+| `REGISTRATION_ALLOWED` | No | `true` | Creation of new accounts. When off, no account is created: neither by password sign-up nor at the first sign-in with GitHub, Google or Microsoft. Existing users still sign in. |
 | `GITHUB_CLIENT_ID` | No | unset | GitHub OAuth app client ID. GitHub sign-in is on when both ID and secret are set. |
 | `GITHUB_CLIENT_SECRET` | No | unset | GitHub OAuth app client secret. |
 | `GOOGLE_CLIENT_ID` | No | unset | Google OAuth client ID. Google sign-in is on when both ID and secret are set. |
@@ -86,8 +88,10 @@ The redirect URI to register with each provider is:
 
 At startup the backend logs which providers are enabled.
 
-:::warning[REGISTRATION_ALLOWED does not stop provider sign-ups]
-A person who signs in with a configured provider for the first time gets a new account, whatever `REGISTRATION_ALLOWED` says. An account whose email the provider has verified is linked to the existing Opsburg user with the same email. To restrict who can join, restrict it at the provider: for Microsoft, set `AZURE_ENTRAID_TENANT_ID` to your tenant; for Google and GitHub, limit who can use the OAuth app.
+:::warning[REGISTRATION_ALLOWED=false closes every way in]
+With registration closed, a person who signs in with a configured provider for the first time gets no account: the console shows "This server does not admit new citizens." A provider account already linked to a user still signs in, and one whose email the provider has verified is linked to the existing Opsburg user with the same email. Invitations create no account either: an invitation link works only for someone who already has one. Let the people you invite sign up before you close registration.
+
+With registration open, anyone who can sign in with a configured provider gets an account. To restrict that, restrict it at the provider: for Microsoft, set `AZURE_ENTRAID_TENANT_ID` to your tenant; for Google and GitHub, limit who can use the OAuth app.
 :::
 
 See [Sign in](../account/sign-in.md) for what users see.
@@ -96,14 +100,14 @@ See [Sign in](../account/sign-in.md) for what users see.
 
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
-| `SECRETS_ENCRYPTION_KEY` | Recommended | unset | 32-byte key, as base64 or as 64 hex characters. Generate it with `openssl rand -base64 32`. |
+| `SECRETS_ENCRYPTION_KEY` | Yes | none | 32-byte key, as base64 or as 64 hex characters. Generate it with `openssl rand -base64 32`. The backend does not start without it, or with a key that does not decode to 32 bytes. |
 
-With a key set, Opsburg encrypts with AES-256-GCM the credentials it keeps in MongoDB: the tokens of [Git connections](../city/git-connections.md), the keys of [AI models](../city/ai-models.md), the credentials of [DNS registrars](../city/dns-registrars.md), and the secret values of applications and resources. Without a key they are stored as plain text.
+Opsburg encrypts with AES-256-GCM the credentials it keeps in MongoDB: the tokens of [Git connections](../city/git-connections.md), the keys of [AI models](../city/ai-models.md), the credentials of [DNS registrars](../city/dns-registrars.md), and the secret values of applications and resources. Since the key is required, no credential is written in clear.
 
-Values stored before you set a key stay readable, and new writes are encrypted from then on.
+An installation upgraded from a release before 0.3.0 that ran without a key still holds the credentials it saved then in clear. They stay readable, and each one is encrypted the next time it is saved.
 
 :::danger[Back up the key]
-A key of the wrong length is reported the first time a credential is read or written. A lost or changed key makes every encrypted credential unreadable: there is no recovery, only entering them again. Store the key with your backups, separately from the database.
+A key of the wrong length stops the backend at startup. A lost or changed key makes every encrypted credential unreadable: there is no recovery, only entering them again. Store the key with your backups, separately from the database.
 :::
 
 ## Logging
@@ -133,7 +137,7 @@ These variables are read by the start scripts of the all-in-one image, not by th
 | `REDIS_PASSWORD` | unset | Password of the embedded Redis. It listens on `127.0.0.1` only, so a password is optional. |
 | `SERVICES_WAIT_TIMEOUT` | `120` | Seconds the backend waits for MongoDB and Redis at start before giving up and letting supervisord retry. |
 
-The image also presets `NODE_ENV=prod`, `PORT=3000`, `TRUST_PROXY=127.0.0.1`, `NOSQL_DATABASE_URL` and `NOSQL_DATABASE_NAME` (see the tables above).
+The image also presets `NODE_ENV=production`, `PORT=3000`, `TRUST_PROXY=127.0.0.1`, `NOSQL_DATABASE_URL` and `NOSQL_DATABASE_NAME` (see the tables above).
 
 ## Browser app: `config.js`
 
@@ -155,4 +159,4 @@ See [Error reporting](./error-reporting.md#browser-app) for how to mount the fil
 
 ## Telemetry
 
-Release 0.2.0 sends no usage data, so there is no telemetry variable to set. See [Telemetry](./telemetry.md).
+Release 0.3.0 sends no usage data, so there is no telemetry variable to set. See [Telemetry](./telemetry.md).

@@ -57,7 +57,7 @@ Opsburg is for teams that run their own Kubernetes clusters and want one place t
 
 ## Self-hosted
 
-You run Opsburg on your own infrastructure. It ships as a container image on `ghcr.io/opsburg/opsburg`, as an all-in-one image that bundles MongoDB, Redis and Nginx, and as a Helm chart. Credentials you store (Git tokens, DNS and AI keys) stay in your database, encrypted when you set an encryption key.
+You run Opsburg on your own infrastructure. It ships as a container image on `ghcr.io/opsburg/opsburg`, as an all-in-one image that bundles MongoDB, Redis and Nginx, and as a Helm chart. Credentials you store (Git tokens, DNS and AI keys) stay in your database, encrypted with a key you set.
 
 The visual style follows the [Opsburg design system](https://opsburg.dev/design-system/). More about the project is on [opsburg.dev](https://opsburg.dev) and on [GitHub](https://github.com/opsburg).
 

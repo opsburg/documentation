@@ -99,7 +99,7 @@ Type an email under **Collaborators** and press **Add** (or Enter). Add up to 20
 
 To found the city alone, press **I am founding it alone for now**. The quest completes without any invitation, and you can invite people later from the same quest.
 
-Invitations, their lifetime and how to revoke them are covered in [Members and invitations](./members-and-invitations.md).
+An invitation does not create an account: when the installation has registration closed, only people who already have an account can accept it. Invitations, their lifetime and how to revoke them are covered in [Members and invitations](./members-and-invitations.md).
 
 :::tip
 On the 3D board, the quest board stays open after the last quest founds the city, so you can copy the invitation links. Press **Enter &lt;city&gt;** when you are done.
