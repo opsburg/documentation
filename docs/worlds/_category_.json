@@ -1,0 +1,8 @@
+{
+  "label": "Worlds",
+  "position": 6,
+  "link": {
+    "type": "generated-index",
+    "description": "A world is a project around the city: one application, a pool of AI agents or many small applications."
+  }
+}

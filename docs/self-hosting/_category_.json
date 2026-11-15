@@ -1,0 +1,8 @@
+{
+  "label": "Self-hosting",
+  "position": 8,
+  "link": {
+    "type": "generated-index",
+    "description": "Run the Opsburg console on your own infrastructure with Docker, Docker Compose or Helm."
+  }
+}

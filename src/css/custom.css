@@ -17,28 +17,28 @@
 
 @font-face {
   font-family: 'Cinzel';
-  src: url('/documentation/fonts/Cinzel-Variable.woff2') format('woff2');
+  src: url('../fonts/Cinzel-Variable.woff2') format('woff2');
   font-weight: 400 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'IBM Plex Sans';
-  src: url('/documentation/fonts/IBMPlexSans-Variable.woff2') format('woff2');
+  src: url('../fonts/IBMPlexSans-Variable.woff2') format('woff2');
   font-weight: 100 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'IBM Plex Mono';
-  src: url('/documentation/fonts/IBMPlexMono-Regular.woff2') format('woff2');
+  src: url('../fonts/IBMPlexMono-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'IBM Plex Mono';
-  src: url('/documentation/fonts/IBMPlexMono-Medium.woff2') format('woff2');
+  src: url('../fonts/IBMPlexMono-Medium.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -300,4 +300,53 @@ a.card:hover {
   font-size: 0.75rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+
+/* ---- Mermaid diagrams on the design system tokens, in both themes ------ */
+/* Mermaid inlines its theme with id selectors, so these need !important. */
+
+.docusaurus-mermaid-container svg .node rect,
+.docusaurus-mermaid-container svg .node polygon,
+.docusaurus-mermaid-container svg .node circle,
+.docusaurus-mermaid-container svg .actor {
+  fill: var(--ob-card) !important;
+  stroke: var(--ob-primary) !important;
+}
+
+.docusaurus-mermaid-container svg .nodeLabel,
+.docusaurus-mermaid-container svg .label,
+.docusaurus-mermaid-container svg text.actor,
+.docusaurus-mermaid-container svg .messageText,
+.docusaurus-mermaid-container svg .noteText {
+  color: var(--ob-foreground) !important;
+  fill: var(--ob-foreground) !important;
+  font-family: var(--ifm-font-family-base) !important;
+}
+
+.docusaurus-mermaid-container svg .edgeLabel,
+.docusaurus-mermaid-container svg .edgeLabel rect,
+.docusaurus-mermaid-container svg .edgeLabel p,
+.docusaurus-mermaid-container svg .labelBkg {
+  background-color: var(--ob-background) !important;
+  fill: var(--ob-background) !important;
+  color: var(--ob-muted-foreground) !important;
+}
+
+.docusaurus-mermaid-container svg .flowchart-link,
+.docusaurus-mermaid-container svg .messageLine0,
+.docusaurus-mermaid-container svg .messageLine1,
+.docusaurus-mermaid-container svg .actor-line {
+  stroke: var(--ob-muted-foreground) !important;
+}
+
+.docusaurus-mermaid-container svg marker path,
+.docusaurus-mermaid-container svg .arrowheadPath,
+.docusaurus-mermaid-container svg #arrowhead path {
+  fill: var(--ob-muted-foreground) !important;
+  stroke: var(--ob-muted-foreground) !important;
+}
+
+.docusaurus-mermaid-container svg .note {
+  fill: var(--ob-muted) !important;
+  stroke: var(--ob-border) !important;
 }

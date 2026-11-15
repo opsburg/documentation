@@ -36,10 +36,10 @@ const SECTIONS = [
     to: '/docs/self-hosting/docker',
   },
   {
-    plaque: 'Connect',
-    title: 'MCP server',
-    text: 'Drive Opsburg from your AI client through the Model Context Protocol.',
-    to: '/docs/integrations/mcp',
+    plaque: 'What changed',
+    title: 'Release notes',
+    text: 'What each Opsburg release added and fixed, linked to the pages that explain it.',
+    to: '/docs/release-notes',
   },
 ];
 
@@ -47,15 +47,15 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="Documentation"
-      description="How to run Opsburg, found a city and keep its worlds flying: self-hosting, organizations, projects, environments, GitOps clusters and the MCP server.">
+      description="How to run Opsburg, found a city and keep its worlds flying: self-hosting, organizations, projects, environments and GitOps clusters.">
       <header className={styles.hero}>
         <div className="container">
           <img className={styles.logo} src={useBaseUrl('/img/logo.png')} alt="" width={96} height={96} />
           <p className={styles.plaque}>Opsburg documentation</p>
           <h1 className={styles.title}>The Mayor's Handbook</h1>
           <p className={styles.lead}>
-            Opsburg builds and ships your apps and AI agents, from the repository to your Kubernetes. Then it
-            turns running them into a city you keep flying. This is how it works.
+            Your organization is a city, your projects are worlds around it, and your Kubernetes clusters
+            take their platform by pull request. This is how to run Opsburg and keep the city flying.
           </p>
           <div className={styles.actions}>
             <Link className="button button--primary button--lg" to="/docs/quick-start">

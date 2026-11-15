@@ -1,0 +1,8 @@
+{
+  "label": "The city",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "The city is your organization: its charter, its people and the machines every world shares."
+  }
+}

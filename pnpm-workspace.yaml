@@ -1,3 +1,9 @@
 allowBuilds:
   '@swc/core': true
   core-js: true
+
+# Transitive dependencies of Docusaurus 3.10.2 lifted past known vulnerabilities
+# (Trivy, HIGH/CRITICAL with a fix): drop each one once Docusaurus ships it.
+overrides:
+  serialize-javascript: ^7.0.3
+  tinypool: ^2.1.2
