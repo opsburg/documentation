@@ -1,0 +1,303 @@
+/**
+ * Opsburg theme for Docusaurus.
+ *
+ * The values are the semantic tokens of @opsburg/design-system (palette
+ * "Ottone e Notte", src/styles/theme.css there), translated into the Infima
+ * variables Docusaurus styles with. The package is a Tailwind v4 theme, so it
+ * cannot be imported here as is. The fonts are the package's own files, copied
+ * into static/fonts (SIL OFL 1.1, licences next to them).
+ *
+ * Rules carried over from the design system:
+ *   - Cinzel (font-display) only for names: the site title, page titles.
+ *     Every sentence, label and button is IBM Plex Sans.
+ *   - Brass as text uses primary-strong (#7E5A0F light, #E6C06A dark): solid
+ *     brass on the light background is 2.5:1, below WCAG AA.
+ *   - Text on a solid brass fill is notte (#0A1E35), never white.
+ */
+
+@font-face {
+  font-family: 'Cinzel';
+  src: url('/documentation/fonts/Cinzel-Variable.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('/documentation/fonts/IBMPlexSans-Variable.woff2') format('woff2');
+  font-weight: 100 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/documentation/fonts/IBMPlexMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/documentation/fonts/IBMPlexMono-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Design system tokens, light theme */
+  --ob-background: #fbf7ee;
+  --ob-foreground: #0a1e35;
+  --ob-card: #fffdf8;
+  --ob-primary: #c9952a;
+  --ob-primary-foreground: #0a1e35;
+  --ob-primary-strong: #7e5a0f;
+  --ob-muted: #f2ecdf;
+  --ob-muted-foreground: #4e5b6b;
+  --ob-accent: #fbede2;
+  --ob-accent-foreground: #7a3a12;
+  --ob-border: #e4d7b8;
+  --ob-ring: #7e5a0f;
+  --ob-notte: #0a1e35;
+  --ob-notte-deep: #071629;
+  --ob-crema: #f6ecd3;
+  --ob-info: #2c5d88;
+  --ob-success: #1e6b5b;
+  --ob-warning: #9a4b14;
+  --ob-destructive: #a8321f;
+  --ob-info-subtle: #e6eef6;
+  --ob-success-subtle: #e4f2ee;
+  --ob-warning-subtle: #fbede2;
+  --ob-destructive-subtle: #f8e6e2;
+
+  /* Infima */
+  --ifm-color-primary: var(--ob-primary-strong);
+  --ifm-color-primary-dark: #6f4f0d;
+  --ifm-color-primary-darker: #684a0c;
+  --ifm-color-primary-darkest: #563d0a;
+  --ifm-color-primary-light: #8d6511;
+  --ifm-color-primary-lighter: #946a12;
+  --ifm-color-primary-lightest: #a97914;
+
+  --ifm-background-color: var(--ob-background);
+  --ifm-background-surface-color: var(--ob-card);
+  --ifm-font-color-base: var(--ob-foreground);
+  --ifm-heading-color: var(--ob-foreground);
+  --ifm-color-content-secondary: var(--ob-muted-foreground);
+  --ifm-hr-border-color: var(--ob-border);
+  --ifm-toc-border-color: var(--ob-border);
+  --ifm-table-border-color: var(--ob-border);
+  --ifm-table-stripe-background: color-mix(in srgb, var(--ob-muted) 55%, transparent);
+  --ifm-menu-color-background-active: var(--ob-muted);
+  --ifm-menu-color-background-hover: color-mix(in srgb, var(--ob-muted) 70%, transparent);
+  --ifm-card-background-color: var(--ob-card);
+
+  --ifm-font-family-base: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ifm-heading-font-family: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ifm-font-family-monospace: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --ifm-line-height-base: 1.65;
+  --ifm-code-font-size: 92%;
+
+  --ifm-global-radius: 6px;
+  --ifm-button-border-radius: 6px;
+  --ifm-card-border-radius: 8px;
+  --ifm-code-border-radius: 4px;
+
+  /* The navbar and footer are night in both themes, as on opsburg.dev. */
+  --ifm-navbar-background-color: var(--ob-notte);
+  --ifm-navbar-link-color: var(--ob-crema);
+  --ifm-navbar-link-hover-color: #e6c06a;
+  --ifm-navbar-shadow: 0 1px 0 color-mix(in srgb, var(--ob-primary) 35%, transparent);
+  --ifm-footer-background-color: var(--ob-notte-deep);
+  --ifm-footer-link-color: #c9d1db;
+  --ifm-footer-link-hover-color: #e6c06a;
+  --ifm-footer-title-color: var(--ob-crema);
+  --ifm-footer-color: #c9d1db;
+
+  --docusaurus-highlighted-code-line-bg: color-mix(in srgb, var(--ob-primary) 18%, transparent);
+}
+
+[data-theme='dark'] {
+  /* Design system tokens, dark theme */
+  --ob-background: #0a1e35;
+  --ob-foreground: #f6ecd3;
+  --ob-card: #11294a;
+  --ob-primary: #d4a440;
+  --ob-primary-strong: #e6c06a;
+  --ob-muted: #15304f;
+  --ob-muted-foreground: #a9b6c6;
+  --ob-accent: #3a2414;
+  --ob-accent-foreground: #f6c9a6;
+  --ob-border: #244369;
+  --ob-ring: #e6c06a;
+  --ob-info: #8fbbe2;
+  --ob-success: #5fc2aa;
+  --ob-warning: #ee9b60;
+  --ob-destructive: #f28473;
+  --ob-info-subtle: #13304d;
+  --ob-success-subtle: #123b39;
+  --ob-warning-subtle: #3a2414;
+  --ob-destructive-subtle: #3d1a17;
+
+  --ifm-color-primary: var(--ob-primary-strong);
+  --ifm-color-primary-dark: #e2b54f;
+  --ifm-color-primary-darker: #dfb042;
+  --ifm-color-primary-darkest: #cf9b24;
+  --ifm-color-primary-light: #eacb85;
+  --ifm-color-primary-lighter: #ecd092;
+  --ifm-color-primary-lightest: #f2dfb5;
+
+  --ifm-navbar-background-color: var(--ob-notte-deep);
+  --ifm-footer-background-color: #051020;
+}
+
+/* ---- Type ------------------------------------------------------------ */
+
+/* Names only: the page title and the site title. */
+.markdown h1:first-child,
+.navbar__title,
+.hero__title,
+.ob-display {
+  font-family: 'Cinzel', Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.navbar__title {
+  font-size: 1.15rem;
+  color: var(--ob-crema);
+}
+
+.markdown h2,
+.markdown h3 {
+  font-weight: 600;
+}
+
+.markdown h2 {
+  border-bottom: 1px solid var(--ob-border);
+  padding-bottom: 0.3rem;
+}
+
+/* Small caps label, the design system's "plaque" style. */
+.ob-plaque,
+.menu__list-item-collapsible > .menu__link--sublist,
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > .menu__link {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ob-muted-foreground);
+}
+
+code {
+  border: 1px solid var(--ob-border);
+  background-color: var(--ob-muted);
+}
+
+a code {
+  color: inherit;
+}
+
+/* ---- Focus: the design system ring, solid, 3:1 on every surface ------ */
+
+:focus-visible {
+  outline: 2px solid var(--ob-ring);
+  outline-offset: 2px;
+}
+
+/* ---- Navbar ------------------------------------------------------------ */
+
+.navbar .navbar__toggle,
+.navbar .clean-btn {
+  color: var(--ob-crema);
+}
+
+.navbar .navbar__link--active {
+  color: #e6c06a;
+}
+
+.navbar-sidebar,
+.navbar-sidebar__brand {
+  background-color: var(--ifm-background-color);
+}
+
+.navbar-sidebar .navbar__title {
+  color: var(--ob-foreground);
+}
+
+.navbar-sidebar .clean-btn {
+  color: var(--ob-foreground);
+}
+
+/* ---- Buttons: solid brass with notte text ----------------------------- */
+
+.button--primary {
+  --ifm-button-background-color: var(--ob-primary);
+  --ifm-button-border-color: var(--ob-primary);
+  --ifm-button-color: var(--ob-primary-foreground);
+  color: var(--ob-primary-foreground);
+}
+
+.button--primary:hover {
+  --ifm-button-background-color: #d4a440;
+  --ifm-button-border-color: #d4a440;
+  color: var(--ob-primary-foreground);
+}
+
+/* ---- Cards (category index pages) ------------------------------------- */
+
+.card {
+  border: 1px solid var(--ob-border);
+  box-shadow: none;
+}
+
+a.card:hover {
+  border-color: var(--ob-primary);
+}
+
+/* ---- Admonitions on the semantic state tokens ------------------------- */
+
+.alert {
+  border-width: 0 0 0 4px;
+  border-radius: 6px;
+  box-shadow: none;
+  color: var(--ob-foreground);
+}
+
+.alert--secondary {
+  --ifm-alert-background-color: var(--ob-muted);
+  --ifm-alert-border-color: var(--ob-muted-foreground);
+}
+.alert--info {
+  --ifm-alert-background-color: var(--ob-info-subtle);
+  --ifm-alert-border-color: var(--ob-info);
+}
+.alert--success {
+  --ifm-alert-background-color: var(--ob-success-subtle);
+  --ifm-alert-border-color: var(--ob-success);
+}
+.alert--warning {
+  --ifm-alert-background-color: var(--ob-warning-subtle);
+  --ifm-alert-border-color: var(--ob-warning);
+}
+.alert--danger {
+  --ifm-alert-background-color: var(--ob-destructive-subtle);
+  --ifm-alert-border-color: var(--ob-destructive);
+}
+
+.alert a {
+  color: var(--ifm-link-color);
+  text-decoration: underline;
+}
+
+/* ---- Footer ------------------------------------------------------------ */
+
+.footer {
+  border-top: 1px solid color-mix(in srgb, var(--ob-primary) 35%, transparent);
+}
+
+.footer__title {
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
