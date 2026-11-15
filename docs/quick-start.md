@@ -14,7 +14,7 @@ This page takes you from nothing to a founded city with one world, on your own m
 - A browser with WebGL 2. Without it, the console still works and shows the same boards as flat panels, without the 3D city.
 
 :::note[Image platform]
-The 0.2.0 images are published for `linux/amd64` only. On an ARM machine (Apple Silicon, for example) add `--platform linux/amd64` to `docker run` so Docker emulates it.
+The images are published for `linux/amd64` only. On an ARM machine (Apple Silicon, for example) add `--platform linux/amd64` to `docker run` so Docker emulates it.
 :::
 
 ## 1. Run the all-in-one image
@@ -34,7 +34,7 @@ docker run -d --name opsburg \
   -v opsburg-data:/data \
   -e FRONTEND_URL=http://localhost:8080 \
   -e SECRETS_ENCRYPTION_KEY \
-  ghcr.io/opsburg/opsburg:0.2.0-all-in-one
+  ghcr.io/opsburg/opsburg:0.3.0-all-in-one
 ```
 
 What each part does:
@@ -43,10 +43,12 @@ What each part does:
 | --- | --- |
 | `-p 8080:80` | Nginx listens on port 80 in the container. It serves the console and proxies `/api` to the backend. MongoDB and Redis listen on the container's loopback only and are not published. |
 | `-v opsburg-data:/data` | Everything that must survive the container lives under `/data`: the database, the Redis dump, repository clones and the generated JWT secret. |
-| `FRONTEND_URL` | The address you open the console at. Invitation links and the return from GitHub, Google or Microsoft sign-in use it, and the session cookie is marked `Secure` only when it starts with `https://`. |
-| `SECRETS_ENCRYPTION_KEY` | 32 bytes, base64 or 64 hex characters. Git tokens, DNS credentials and AI keys are encrypted at rest with it. Without it they are stored in clear text. |
+| `FRONTEND_URL` | Required. The address you open the console at, starting with `http://` or `https://`. Invitation links and the return from GitHub, Google or Microsoft sign-in use it, and the session cookie is marked `Secure` only when it starts with `https://`. |
+| `SECRETS_ENCRYPTION_KEY` | Required. 32 bytes, base64 or 64 hex characters. Git tokens, DNS credentials and AI keys are encrypted at rest with it. |
 
-The tag `all-in-one` follows the latest release; `0.2.0-all-in-one` pins this version.
+The tag `all-in-one` follows the latest release; `0.3.0-all-in-one` pins this version.
+
+Without `FRONTEND_URL` or `SECRETS_ENCRYPTION_KEY` the container stops at once, before it starts MongoDB, and its log names the missing variables. A `FRONTEND_URL` that is not an `http(s)` address, or a key that does not decode to 32 bytes, makes the backend refuse to start, with the reason in the log.
 
 :::warning[Keep the encryption key]
 Pass the same `SECRETS_ENCRYPTION_KEY` on every start. If you recreate the container with a different key, the credentials already saved cannot be read back.
@@ -73,7 +75,7 @@ Open [http://localhost:8080](http://localhost:8080). The camera flies to **The c
 You are signed in at once. There is no email verification and no installation administrator: every account is equal, and the account that completes the first founding quest becomes the founder, that is the owner, of that city.
 
 :::tip[Close registration after the first accounts]
-Registration is open by default. Anyone who can reach the console can create an account and found a city of their own. Set `REGISTRATION_ALLOWED=false` once your team has signed up, and invite the others by link. See [Sign in](./account/sign-in.md) for what that setting does and does not cover.
+Registration is open by default. Anyone who can reach the console can create an account and found a city of their own. Set `REGISTRATION_ALLOWED=false` once everybody who needs an account has one. From then on nobody new can get an account, with a password or with GitHub, Google or Microsoft, so an invitation link works only for someone who already has an account. Invite people while registration is still open. See [Sign in](./account/sign-in.md#what-the-operator-controls).
 :::
 
 ## 3. Dress your citizen
@@ -115,7 +117,7 @@ A new world asks for its environments before anything else. On its board, under 
 The command above is meant for a trial on one machine. For a real installation:
 
 - [Docker](./self-hosting/docker.md): the all-in-one and standard images in detail.
-- [Docker Compose](./self-hosting/docker-compose.md): Opsburg with its own MongoDB and Redis containers.
+- [Docker Compose](./self-hosting/docker-compose.md): Opsburg with its own MongoDB container.
 - [Helm](./self-hosting/helm.md): the chart on `oci://ghcr.io/opsburg/charts/opsburg`.
 - [Environment variables](./self-hosting/environment-variables.md): every setting, including a fixed `JWT_SECRET` and the sign-in providers.
 - Put the console behind HTTPS and set `FRONTEND_URL` to its `https://` address, so the session cookie is sent only over TLS.

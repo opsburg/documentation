@@ -30,7 +30,7 @@ Login and registration are rate limited per IP address: by default 10 attempts p
 
 ## GitHub, Google and Microsoft
 
-When the server has credentials for a provider, the gates show its tile under **or enter with**. Choose it, sign in at the provider, and you come back to the console signed in. If the account is new to Opsburg, it is created on the spot and you go to the atelier.
+When the server has credentials for a provider, the gates show its tile under **or enter with**. Choose it, sign in at the provider, and you come back to the console signed in. If the account is new to Opsburg, it is created on the spot and you go to the atelier, unless the operator has closed registration (see [What the operator controls](#what-the-operator-controls)).
 
 How it works:
 
@@ -47,7 +47,7 @@ Opsburg links an external account to an existing user when the provider vouches 
 
 1. An external account already linked to a user always signs in as that user.
 2. Otherwise, if the provider confirms the email is verified and a user has that email, the external account is linked to that user.
-3. Otherwise a new user is created.
+3. Otherwise a new user is created. When registration is closed (`REGISTRATION_ALLOWED=false`), no user is created and the gates show "This server does not admit new citizens."
 
 An email the provider does not verify is never used for linking, and is not stored. For Google, a verified email is required to sign in at all. For GitHub, Opsburg uses the primary email only when it is verified. For Microsoft, the email is trusted for personal accounts, or for work accounts when Entra ID states that the tenant owns the domain.
 
@@ -59,6 +59,7 @@ An email the provider does not verify is never used for linking, and is not stor
 | The provider refused the sign-in. Try again. | The provider returned an error, or the code exchange failed. |
 | Your email with that provider is not verified. | Google did not confirm the account's email. |
 | Sign-in cancelled. | You cancelled at the provider. |
+| This server does not admit new citizens. | Registration is closed and the provider account matches no Opsburg user, neither by a previous link nor by verified email. |
 
 ## The session
 
@@ -72,7 +73,7 @@ A successful sign-in sets a session cookie named `opsburg_session`:
 
 ## Arriving with an invitation
 
-An invitation link opens the gates with a line such as "*Ada* invites you to *Harbor*. Sign in, or register, to take up residence." Sign in or register with any method: the console keeps the invitation in the tab during a GitHub, Google or Microsoft round trip, and you join that city once you are in. See [Members and invitations](../city/members-and-invitations.md).
+An invitation link opens the gates with a line such as "*Ada* invites you to *Harbor*. Sign in, or register, to take up residence." Sign in or register with any method: the console keeps the invitation in the tab during a GitHub, Google or Microsoft round trip, and you join that city once you are in. When the operator has closed registration, only an existing account can accept: the link does not let you create one. See [Members and invitations](../city/members-and-invitations.md).
 
 ## What the operator controls
 
@@ -81,13 +82,13 @@ Which options appear depends on server configuration. The console asks the backe
 | Setting | Default | Effect on the gates |
 | --- | --- | --- |
 | `ALLOW_EMBEDDED_LOGIN` | `true` | When `false`, the username and password form disappears and password sign-in and registration are refused. Only provider tiles remain. |
-| `REGISTRATION_ALLOWED` | `true` | When `false`, the **Found a city** link disappears and password registration is refused. |
+| `REGISTRATION_ALLOWED` | `true` | When `false`, no new account is created: the **Found a city** link disappears, password registration is refused, and a first sign-in with GitHub, Google or Microsoft is refused too. Existing users still sign in. |
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | unset | Both set: the GitHub tile appears. |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | unset | Both set: the Google tile appears. |
 | `AZURE_ENTRAID_CLIENT_ID`, `AZURE_ENTRAID_CLIENT_SECRET` | unset | Both set: the Microsoft tile appears. |
 | `AZURE_ENTRAID_TENANT_ID` | `common` | Which Microsoft accounts are accepted: `common` (any), `organizations` (work and school accounts), `consumers` (personal accounts) or one tenant ID. |
 | `AUTH_RATE_LIMIT_MAX` | `10` | Login and registration attempts per minute per IP. |
-| `FRONTEND_URL`, `PUBLIC_URL` | `http://localhost:5173` | Where the browser returns after an external sign-in, and the origin of the callback URL. `PUBLIC_URL` defaults to `FRONTEND_URL`. |
+| `FRONTEND_URL`, `PUBLIC_URL` | `FRONTEND_URL` is required, `PUBLIC_URL` defaults to it | Where the browser returns after an external sign-in, and the origin of the callback URL. The backend does not start without `FRONTEND_URL`. |
 
 The callback URL to register with each provider is:
 
@@ -97,8 +98,8 @@ The callback URL to register with each provider is:
 <PUBLIC_URL>/api/auth/microsoft/callback
 ```
 
-:::warning[Closing registration does not close external sign-in]
-`REGISTRATION_ALLOWED=false` only stops the username and password registration. A first sign-in with an enabled provider still creates an account. To keep strangers out, enable only providers whose accounts you control (for example a single Microsoft tenant in `AZURE_ENTRAID_TENANT_ID`), or keep the console on a private network.
+:::warning[Closing registration closes it for everybody]
+With `REGISTRATION_ALLOWED=false` nobody new can get an account, with a password or with a provider. A provider account still signs in when it is already linked to a user, or when the provider verifies an email that belongs to an existing user: it is then linked to that user. Invitations do not open the gates: an invitation link works only for someone who already has an account. Invite people and let them sign up before you close registration, or open it again for a while when someone new has to join.
 :::
 
 Every variable is described in [Environment variables](../self-hosting/environment-variables.md).

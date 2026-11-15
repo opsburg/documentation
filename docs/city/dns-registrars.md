@@ -35,7 +35,7 @@ Open **Settings · AI models** on the city board and scroll to **DNS registrars*
 
 "Secrets are stored encrypted and never shown again." The founder sees the non secret fields (ids, resource group) when editing; the secret comes back as a placeholder and is kept unless retyped. Change the account fields or the provider and you must type the secret again. Citizens see only the name and provider.
 
-Secrets are encrypted at rest when the operator sets `SECRETS_ENCRYPTION_KEY`. See [AI models](./ai-models.md#how-keys-are-stored).
+Secrets are encrypted at rest with the operator's `SECRETS_ENCRYPTION_KEY`, which the backend requires to start. See [AI models](./ai-models.md#how-keys-are-stored).
 
 ## Test a registrar
 

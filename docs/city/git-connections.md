@@ -90,6 +90,6 @@ When the founder charts or redraws a world, the form has a **Code kept in** sele
 
 "Tokens are stored encrypted and never shown again." The API never returns a token, to the founder either; it returns only the name, provider, address, namespace and default flag.
 
-Tokens are encrypted with AES-256-GCM when the operator sets `SECRETS_ENCRYPTION_KEY`. See [AI models](./ai-models.md#how-keys-are-stored) for what the key protects and what happens without it.
+Tokens are encrypted with AES-256-GCM with the operator's `SECRETS_ENCRYPTION_KEY`, which the backend requires to start. See [AI models](./ai-models.md#how-keys-are-stored) for what the key protects and why you must keep it.
 
 Opsburg sends the token only to the address stored with the connection, and does not follow redirects, so a redirect cannot carry the token to another host.

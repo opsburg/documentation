@@ -64,6 +64,10 @@ The token is kept in the browser tab while you sign in, so an OAuth round trip t
 
 If the link was used, revoked or expired, the gate says "This invitation is not valid anymore: it was used, revoked or it expired."
 
+:::note[When registration is closed]
+An invitation does not create an account. When the operator sets `REGISTRATION_ALLOWED=false`, the invitee can neither register with a password nor get a new account at a first sign-in with GitHub, Google or Microsoft: the gates answer "This server does not admit new citizens." The link then works only for someone who already has an account on the installation. Ask the operator to open registration while new people join. See [Sign in](../account/sign-in.md#what-the-operator-controls).
+:::
+
 :::warning[The link is the proof]
 Whoever holds a link can accept it, whatever email it was sent to. Password sign-ups do not verify the email address, so Opsburg cannot check that the person who opens the link owns the invited address. Send links through a channel you trust, and revoke any link that may have leaked.
 :::
